@@ -1,4 +1,4 @@
-package main
+package convert
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 
 func TestOutputPath(t *testing.T) {
 	dir := t.TempDir()
-	got := outputPath(filepath.Join(dir, "2026-05-16 Mount Pleasant Baptist.4ss"))
+	got := OutputPath(filepath.Join(dir, "2026-05-16 Mount Pleasant Baptist.4ss"))
 	want := filepath.Join(dir, "2026-05-16 Mount Pleasant Baptist (forScore12plus).4ss")
 	if got != want {
 		t.Fatalf("outputPath: got %q want %q", got, want)
@@ -23,7 +23,7 @@ func TestConvertSample(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	out, err := convert(data, setlistTitle(path))
+	out, err := Convert(data, SetlistTitle(path))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestConvertSample(t *testing.T) {
 }
 
 func TestConvertRejectsXML(t *testing.T) {
-	_, err := convert([]byte(`<?xml version="1.0"?><forScore kind="setlist" version="1.0" title="x"/>`), "x")
+	_, err := Convert([]byte(`<?xml version="1.0"?><forScore kind="setlist" version="1.0" title="x"/>`), "x")
 	if err == nil {
 		t.Fatal("expected error for Open Setlist XML input")
 	}

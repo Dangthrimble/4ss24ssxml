@@ -1,0 +1,9 @@
+.DS_Store
+*.exe
+/4ss24ssxml
+/cmd/4ss24ssxml/4ss24ssxml
+*.test
+.idea/
+.vscode/
+*.swp
+*~
