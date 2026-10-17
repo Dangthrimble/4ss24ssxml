@@ -1,4 +1,4 @@
-package main
+package convert
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ type setlistItem struct {
 	Path  string
 }
 
-func outputPath(input string) string {
+func OutputPath(input string) string {
 	dir := filepath.Dir(input)
 	base := filepath.Base(input)
 	ext := filepath.Ext(base)
@@ -34,12 +34,12 @@ func outputPath(input string) string {
 	return filepath.Join(dir, stem+" (forScore12plus)"+ext)
 }
 
-func setlistTitle(input string) string {
+func SetlistTitle(input string) string {
 	base := filepath.Base(input)
 	return strings.TrimSuffix(base, filepath.Ext(base))
 }
 
-func convert(data []byte, title string) ([]byte, error) {
+func Convert(data []byte, title string) ([]byte, error) {
 	if isOpenSetlistXML(data) {
 		return nil, fmt.Errorf("file is already an Open Setlist XML document")
 	}
