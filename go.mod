@@ -1,4 +1,4 @@
-module 4ss2xml
+module 4ss24ssxml
 
 go 1.24.1
 
