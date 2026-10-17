@@ -26,17 +26,40 @@ type setlistItem struct {
 	Path  string
 }
 
+const forScore12PlusSuffix = " (forScore12plus)"
+
 func OutputPath(input string) string {
 	dir := filepath.Dir(input)
 	base := filepath.Base(input)
 	ext := filepath.Ext(base)
 	stem := strings.TrimSuffix(base, ext)
-	return filepath.Join(dir, stem+" (forScore12plus)"+ext)
+	return filepath.Join(dir, stem+forScore12PlusSuffix+ext)
+}
+
+// TextOutputPath returns a sibling Open Setlist path: stem (forScore12plus).4ss.
+func TextOutputPath(input string) string {
+	dir := filepath.Dir(input)
+	base := filepath.Base(input)
+	stem := strings.TrimSuffix(base, filepath.Ext(base))
+	return filepath.Join(dir, stem+forScore12PlusSuffix+".4ss")
 }
 
 func SetlistTitle(input string) string {
 	base := filepath.Base(input)
 	return strings.TrimSuffix(base, filepath.Ext(base))
+}
+
+// FromText builds an Open Setlist XML document with one placeholder per non-blank line.
+func FromText(data []byte, title string) ([]byte, error) {
+	var items []setlistItem
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(strings.TrimSuffix(line, "\r"))
+		if line == "" {
+			continue
+		}
+		items = append(items, setlistItem{Kind: kindPlaceholder, Title: line})
+	}
+	return marshalOpenSetlist(title, items)
 }
 
 func Convert(data []byte, title string) ([]byte, error) {

@@ -112,3 +112,56 @@ func TestConvertRejectsXML(t *testing.T) {
 		t.Fatal("expected error for Open Setlist XML input")
 	}
 }
+
+func TestTextOutputPath(t *testing.T) {
+	dir := t.TempDir()
+	got := TextOutputPath(filepath.Join(dir, "Sunday.txt"))
+	want := filepath.Join(dir, "Sunday (forScore12plus).4ss")
+	if got != want {
+		t.Fatalf("TextOutputPath: got %q want %q", got, want)
+	}
+}
+
+func TestFromText(t *testing.T) {
+	in := []byte("First\n\n  \nSecond\r\n\tThird\t\n")
+	out, err := FromText(in, "Sunday")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type item struct {
+		XMLName xml.Name
+		Title   string `xml:"title,attr"`
+		Path    string `xml:"path,attr"`
+	}
+	var parsed struct {
+		Kind    string `xml:"kind,attr"`
+		Version string `xml:"version,attr"`
+		Title   string `xml:"title,attr"`
+		Items   []item `xml:",any"`
+	}
+	if err := xml.Unmarshal(out, &parsed); err != nil {
+		t.Fatal(err)
+	}
+	if parsed.Kind != "setlist" || parsed.Version != "1.0" || parsed.Title != "Sunday" {
+		t.Fatalf("header: %+v", parsed)
+	}
+	if len(parsed.Items) != 3 {
+		t.Fatalf("items: got %d want 3\n%s", len(parsed.Items), out)
+	}
+	wantTitles := []string{"First", "Second", "Third"}
+	for i, it := range parsed.Items {
+		if it.XMLName.Local != "placeholder" {
+			t.Fatalf("item %d kind: %s", i, it.XMLName.Local)
+		}
+		if it.Title != wantTitles[i] {
+			t.Fatalf("item %d title: got %q want %q", i, it.Title, wantTitles[i])
+		}
+		if it.Path != "" {
+			t.Fatalf("item %d unexpected path %q", i, it.Path)
+		}
+	}
+	if !bytes.HasPrefix(out, []byte(`<?xml version="1.0" encoding="UTF-8" ?>`)) {
+		t.Fatalf("missing XML declaration:\n%s", out[:80])
+	}
+}

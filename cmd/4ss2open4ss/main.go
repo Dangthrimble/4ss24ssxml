@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "usage: %s <file.4ss>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "usage: 4ss2open4ss <file.4ss>\n")
 		os.Exit(2)
 	}
 	input := os.Args[1]
